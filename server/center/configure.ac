@@ -8,7 +8,8 @@ m4_include([ax_cxx_compile_stdcxx_0x.m4])
 # Add a test for a compiler.
 AC_PROG_CC
 AC_PROG_CXX
-AM_PROG_LIBTOOL
+#AM_PROG_LIBTOOL
+LT_INIT
 AX_CXX_COMPILE_STDCXX_0X
 
 if test "x$ax_cv_cxx_compile_cxx0x_cxx" = "xyes" ; then

@@ -2169,7 +2169,7 @@ dcmd_api::DcmdState DcmdCenterTaskMgr::TaskCmdUnfreezeTask(DcmdTss* tss, uint32_
         while (pool_iter != task->pools_.end()) {
           if (iter->second->pools_.find(pool_iter->first) != iter->second->pools_.end()) {
             CwxCommon::snprintf(tss->sql_, DcmdTss::kMaxSqlBufSize,
-              "Conflict with task[%s], freeze it first.", task->task_name.c_str());
+              "Conflict with task[%s], freeze it first.", task->task_name_.c_str());
             tss->err_msg_ = tss->sql_;
             return dcmd_api::DCMD_STATE_FAILED;
           }
