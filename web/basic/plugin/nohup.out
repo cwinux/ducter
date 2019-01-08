@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "monitor_alarm.py", line 78, in <module>
+    Monitor()
+  File "monitor_alarm.py", line 53, in Monitor
+    time.sleep(50)
+KeyboardInterrupt
+Exception KeyboardInterrupt in <module 'threading' from '/usr/lib64/python2.6/threading.pyc'> ignored

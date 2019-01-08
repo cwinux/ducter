@@ -1,0 +1,120 @@
+#!/bin/bash
+
+PATH=$PATH:/usr/sbin:/sbin:/bin
+export PATH
+echo $PATH
+
+SERVICE_HOME=$DCMD_SVR_PATH/deploy/$DCMD_SVR_NAME
+echo "SERVICE_HOME= $SERVICE_HOME"
+
+prepare(){
+echo  "Begin prepare........."
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "prepare enviroment:"
+id $DCMD_SVR_USER >/dev/null  
+if [ $? -ne 0 ];then  
+   useradd $DCMD_SVR_USER  
+   id $DCMD_SVR_USER
+fi 
+echo "$DCMD_SVR_USER user is ready."
+[[ ! -d "$DCMD_SVR_PATH" ]] && mkdir -p $DCMD_SVR_PATH
+[[ ! -d "$SERVICE_HOME" ]] && mkdir -p $SERVICE_HOME
+chown -R $DCMD_SVR_USER.$DCMD_SVR_USER $DCMD_SVR_PATH 
+id $DCMD_SVR_USER >/dev/null && [[ -d "$DCMD_SVR_PATH" ]]
+exit $?
+}
+
+start(){
+echo  "Begin start........."
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "start enviroment:"
+cd $SERVICE_HOME/sbin
+sh start.sh
+exit $?
+}
+
+stop(){
+echo  "Begin stop........."
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "stop enviroment:"
+cd $SERVICE_HOME/sbin
+sh stop.sh
+exit $?
+}
+
+check(){
+echo  "Begin check........."
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "check enviroment:"
+ps aux | grep as_server | grep -v grep
+exit $?
+}
+
+install(){
+echo  "Begin install........."
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "install type: $3"
+LOG_DIR=$SERVICE_HOME/logs
+[[ ! -d "$LOG_DIR" ]] && mkdir -p $LOG_DIR
+BIN_DIR=$SERVICE_HOME/bin
+CONF_DIR=$SERVICE_HOME/conf
+
+if [ $3 == "all" ];then
+  echo  "new_pkg_path: $4"
+  echo  "new_env_path: $5"
+  SERVICE_PKG=$4
+  SERVICE_ENV=$5
+  mv -f $SERVICE_HOME/bin $SERVICE_HOME/bin_bak
+  [[ ! -d "$BIN_DIR" ]] && mkdir -p $BIN_DIR
+  cp -afr $SERVICE_HOME/conf $SERVICE_HOME/conf_`date '+%Y%m%d%H%M%S'`
+
+  echo "cp -af $SERVICE_PKG/bin/as_* $BIN_DIR/"
+  echo "cp -af $SERVICE_ENV/conf/as*.ini $CONF_DIR/"
+  cp -af $SERVICE_PKG/bin/as_* $BIN_DIR/
+  cp -af $SERVICE_ENV/conf/as*.ini $CONF_DIR/
+  md5sum $SERVICE_HOME/bin/as_server
+  md5sum $SERVICE_HOME/conf/as*.ini
+  echo "----> copy complete!"
+elif [ $3 == "pkg" ];then
+  echo  "new_pkg_path: $4"
+  SERVICE_PKG=$4
+  mv -f $SERVICE_HOME/bin $SERVICE_HOME/bin_bak
+  [[ ! -d "$BIN_DIR" ]] && mkdir -p $BIN_DIR
+  echo "cp -af $SERVICE_PKG/bin/as_* $BIN_DIR/"
+  cp -af $SERVICE_PKG/bin/as_* $BIN_DIR/
+  md5sum $SERVICE_HOME/bin/as_server
+  echo "----> copy complete!"
+elif [ $3 == "env" ];then
+  echo  "new_env_path: $4"
+  SERVICE_ENV=$4
+  echo "cp -af $SERVICE_ENV/conf/as*.ini $CONF_DIR/"
+  cp -ar $SERVICE_HOME/conf $SERVICE_HOME/conf_`date '+%Y%m%d%H%M%S'`
+  cp -af $SERVICE_ENV/conf/as*.ini $CONF_DIR/
+  md5sum $SERVICE_HOME/conf/as*.ini
+  echo "----> copy complete!"
+else
+  echo "invalid install type:$3"
+fi
+echo  "End install."
+}
+
+if [ $1 == "start" ]; then
+  start $*
+elif [ $1 == "stop" ]; then
+  stop $*
+elif [ $1 == "check" ]; then
+  sleep 3
+  check $*
+elif [ $1 == "install" ]; then
+  install $*
+elif [ $1 == "prepare" ]; then
+  prepare $*
+else
+  echo "invalid action"
+fi
+

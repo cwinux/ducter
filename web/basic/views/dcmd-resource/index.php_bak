@@ -1,0 +1,342 @@
+<link href="/ducter/css/tabs.css" rel="stylesheet">
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\DetailView;
+use yii\grid\GridView;
+use yii\helpers\Url;
+use yii\bootstrap\Alert;
+/* @var $this yii\web\View */
+/* @var $model app\models\DcmdServicePool */
+
+$this->title = "资源信息";
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+<?php
+  if( Yii::$app->getSession()->hasFlash('success') ) {
+      echo Alert::widget([
+          'options' => [
+              'class' => 'alert-success', //这里是提示框的class
+          ],
+          'body' => Yii::$app->getSession()->getFlash('success'), //消息体
+      ]);
+  }
+  if( Yii::$app->getSession()->hasFlash('error') ) {
+      echo Alert::widget([
+          'options' => [
+              'class' => 'alert-success',
+          ],
+          'body' => "<font color=red>".Yii::$app->getSession()->getFlash('error')."</font>",
+      ]);
+  }
+?>
+<SCRIPT LANGUAGE="JavaScript">
+  var d = function(o)  {
+    return document.getElementById(o);
+  }
+ 
+  function showDiv(parm){
+    writeCookie('resTab', parm);
+    d('dcmd-dns').style.display = 'none';    
+    d('dcmd-slb').style.display='none';    
+    d('dcmd-lvs').style.display='none';
+    d('dcmd-cbase').style.display='none';
+    d('dcmd-redis').style.display = 'none';    
+    d('dcmd-mq').style.display='none';    
+    d('dcmd-gluster').style.display='none';
+    d('dcmd-mysql').style.display='none';
+    d('dcmd-mongo').style.display='none';    
+    d('dcmd-oracle').style.display='none';
+    d('dcmd-mcluster').style.display='none';
+    d(parm).style.display = '';    
+    
+    for(var i in d('ulMenu').getElementsByTagName('LI')){        
+     d('ulMenu').getElementsByTagName('LI')[i].className = 'codeDemomouseOutMenu';    
+    }
+  }
+</SCRIPT>
+<ul class="codeDemoUL" id="ulMenu">
+  <li class="codeDemomouseOnMenu" id="dcmd-dns-l" onclick="showDiv('dcmd-dns');this.className='codeDemomouseOnMenu'">DNS</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-slb-l" onclick="showDiv('dcmd-slb');this.className='codeDemomouseOnMenu'">SLB</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-lvs-l" onclick="showDiv('dcmd-lvs');this.className='codeDemomouseOnMenu'">LVS</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-cbase-l" onclick="showDiv('dcmd-cbase');this.className='codeDemomouseOnMenu'">Cbase</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-redis-l" onclick="showDiv('dcmd-redis');this.className='codeDemomouseOnMenu'">Redis</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-mq-l" onclick="showDiv('dcmd-mq');this.className='codeDemomouseOnMenu'">Mq</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-gluster-l" onclick="showDiv('dcmd-gluster');this.className='codeDemomouseOnMenu'">Gluster</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-mysql-l" onclick="showDiv('dcmd-mysql');this.className='codeDemomouseOnMenu'">MySQL</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-mongo-l" onclick="showDiv('dcmd-mongo');this.className='codeDemomouseOnMenu'">Mongo</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-oracle-l" onclick="showDiv('dcmd-oracle');this.className='codeDemomouseOnMenu'">Oracle</li>
+  <li class="codeDemomouseOutMenu" id="dcmd-mcluster-l" onclick="showDiv('dcmd-mcluster');this.className='codeDemomouseOnMenu'">Mcluster</li>
+</ul>
+<form id="w0" action="/index.php?r=dcmd-service-pool/delete-select" method="post">
+<div class="dcmd-dns-view" id="dcmd-dns">
+    <?= GridView::widget([
+        'dataProvider' => $dnsProvider,
+        'filterModel' => $dnsModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号', 'enableSorting'=>false,),
+            array('attribute'=>'res_name', 'label'=>'资源名称', 'enableSorting'=>false),
+            array('attribute'=>'is_public', 'label'=>'是否公共资源', 'enableSorting'=>false,'filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'name', 'label'=>'资源别名', 'enableSorting'=>false),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company,'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+//            ['class' => 'yii\grid\ActionColumn','template'=>'{delete}', 'urlCreator'=>function($action, $model, $key, $index) {if ("delete" == $action) return Url::to(['dcmd-service-pool-node/delete','id'=>$model['id'], 'svr_pool_id'=>$model['svr_pool_id']]);}, "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-slb-view" id="dcmd-slb" style="display:none" >
+    <?= GridView::widget([
+        'dataProvider' => $slbProvider,
+        'filterModel' => $slbModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号', 'enableSorting'=>false,), 
+            array('attribute'=>'res_name', 'label'=>'资源名称', 'enableSorting'=>false,),
+            array('attribute'=>'is_public', 'label'=>'是否公共资源', 'enableSorting'=>false,'filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'name', 'label'=>'资源别名', 'enableSorting'=>false),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+  //          ['class' => 'yii\grid\ActionColumn','template'=>'{delete}', 'urlCreator'=>function($action, $model, $key, $index) {if ("delete" == $action) return Url::to(['dcmd-service-pool-node/delete','id'=>$model['id'], 'svr_pool_id'=>$model['svr_pool_id']]);}, "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]) ?>
+</div>
+
+<div class="dcmd-lvs-view" id="dcmd-lvs" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $lvsProvider,
+        'filterModel' => $lvsModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称'),
+            array('attribute'=>'is_public', 'label'=>'是否公共资源', 'enableSorting'=>false,'filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'vip', 'label'=>'VIP', 'enableSorting'=>false),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+   //         ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+
+</div>
+
+<div class="dcmd-cbase-view" id="dcmd-cbase" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $cbsProvider,
+        'filterModel' => $cbsModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称', 'enableSorting'=>false,),
+            array('attribute'=>'is_public','label'=>'是否公共资源','filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'cluster','label'=>'集群名称'),
+            array('attribute'=>'bucket','label'=>'Bucket名称'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+     //       ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-redis-view" id="dcmd-redis" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $rdsProvider,
+        'filterModel' => $rdsModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false),
+            array('attribute'=>'is_public','label'=>'是否公共资源','filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'cluster','label'=>'集群名称'),
+            array('attribute'=>'port','label'=>'实例名称'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+       //     ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-mq-view" id="dcmd-mq" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $mqProvider,
+        'filterModel' => $mqModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false,),
+            array('attribute'=>'is_public','label'=>'是否公共资源','filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'cluster','label'=>'集群名称'),
+            array('attribute'=>'queue','label'=>'队列名称'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+         //   ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-gluster-view" id="dcmd-gluster" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $glsProvider,
+        'filterModel' => $glsModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false,),
+            array('attribute'=>'is_public','label'=>'是否公共资源','filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'cluster','label'=>'集群名称'),
+            array('attribute'=>'volume','label'=>'Volume'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+           // ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-mysql-view" id="dcmd-mysql" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $mqlProvider,
+        'filterModel' => $mqlModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false,),
+            array('attribute'=>'is_public','label'=>'是否公共资源','filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'server','label'=>'主机名'),
+            array('attribute'=>'port','label'=>'端口'),
+            array('attribute'=>'db','label'=>'数据库名称'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+          //  ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-oracle-view" id="dcmd-oracle" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $orcProvider,
+        'filterModel' => $orcModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false,),
+            array('attribute'=>'is_public','label'=>'是否公共资源','filter'=>["0"=>"否","1"=>"是"],'content'=> function($model, $key, $index, $column) { return $model['is_public'] ? '是':'否';}),
+            array('attribute'=>'cluster_ip','label'=>'集群IP'),
+            array('attribute'=>'schema_name','label'=>'Schema Name'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+           // ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-mcluster-view" id="dcmd-mcluster" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $mclProvider,
+        'filterModel' => $mclModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false,),
+            array('attribute'=>'cluster','label'=>'集群名称'),
+            array('attribute'=>'port','label'=>'端口'),
+            array('attribute'=>'db','label'=>'数据库名称'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+          //  ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<div class="dcmd-mongo-view" id="dcmd-mongo" style="display:none" >
+<?= GridView::widget([
+        'dataProvider' => $mngProvider,
+        'filterModel' => $mngModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            array('attribute'=>'res_id','label'=>'唯一行号'),
+            array('attribute'=>'res_name', 'label'=>'资源名称','enableSorting'=>false,),
+            array('attribute'=>'cluster','label'=>'集群名称'),
+            array('attribute'=>'instance','label'=>'实例名称'),
+            array('attribute'=>'port','label'=>'端口'),
+            array('attribute'=>'comp_id', 'label'=>'所属公司', 'filter'=>$company, 'enableSorting'=>false,'content'=> function($model, $key, $index, $column) { return $model->getComp($model->comp_id);}),
+            array('attribute'=>'contact', 'label'=>'联系人','enableSorting'=>false,),
+            array('attribute'=>'state', 'label'=>'状态', 'enableSorting'=>false),
+          //  ['class' => 'yii\grid\ActionColumn',  "visible"=>(Yii::$app->user->getIdentity()->admin == 1) ? true : false],
+        ],
+    ]); ?>
+</div>
+
+<body onload="setTab()">
+<script src="./jquery-2.1.1.min.js">
+  <?php 
+    if(!empty($show_div)) 
+     echo "document.getElementById('". $show_div."-l').click()";
+  ?>
+</script>
+<script>
+  function setTab()
+  {
+    var show_div = readCookie('resTab') + '-l';
+    document.getElementById(show_div).click()
+  }
+  function saveRadioValue()
+  {
+      var rad = document.getElementsByName("myRadio");
+      var radval = 1;
+      for(var i=0;i<rad.length;i++)
+      {
+         if(rad[i].checked)
+               var radval = rad[i].value;
+      }
+      var cookiename = 'alarmlevel';
+      writeCookie(cookiename, radval);
+      window.location.reload(); 
+      
+  }
+  function writeCookie(name, value, hours) {
+      var expire = "";
+      hours = 0.5;
+      if (hours != null) {
+          expire = new Date((new Date()).getTime() + hours * 3600000);
+          expire = "; expires=" + expire.toGMTString();
+      }
+      document.cookie = name + "=" + escape(value) + expire;
+  }
+  function readCookie(name) {
+      var cookieValue = "";
+      var search = name + "=";
+      if (document.cookie.length > 0) {
+          offset = document.cookie.indexOf(search);
+          if (offset != -1) {
+              offset += search.length;
+              end = document.cookie.indexOf(";", offset);
+              if (end == -1) end = document.cookie.length;
+              cookieValue = unescape(document.cookie.substring(offset, end))
+          }
+      }
+      var rad = document.getElementsByName("myRadio");
+      return cookieValue;
+  }
+  $(document).on('mouseover','.sourceID',function(e){
+    tip="<p class='tip'><font size='2'>DETAIL</font></p>";
+    $(".sourceID").append(tip);
+    $(".tip").css({"top":(e.pageY-30)+"px","left":(e.pageX-35)+"px","position":"absolute", "background": "gray", "box-shadow": "-2px -2px 0 -1px #c4c4c4", "box-shadow": "0 2px 8px rgba(0,0,0,.3)", "color": "white"}).show("fast");
+  });
+  $(document).on('mouseleave','.sourceID',function(e){
+    $(".tip").remove();
+  }); 
+</script>
+
+

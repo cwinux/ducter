@@ -1,0 +1,82 @@
+#!/bin/bash
+
+prepare(){
+echo  "Begin prepare........."
+echo  "User:" `/bin/whoami`
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "start enviroment:"
+set|grep DCMD
+echo  "End prepare."
+exit 0
+}
+
+start(){
+echo  "Begin start........."
+echo  "User:" `/bin/whoami`
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "start enviroment:"
+set|grep DCMD
+echo  "End start."
+exit 0
+}
+
+stop(){
+echo  "Begin stop........."
+echo  "User:" `/bin/whoami`
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "stop enviroment:"
+set|grep DCMD
+echo  "End stop."
+exit 0
+}
+
+check(){
+echo  "Begin check........."
+echo  "User:" `/bin/whoami`
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "check enviroment:"
+set|grep DCMD
+echo  "End check."
+exit 0
+}
+
+install(){
+echo  "Begin install........."
+echo  "User:" `/bin/whoami`
+echo  "Action: $1"
+echo  "service home: $2"
+echo  "install type: $3"
+if [ $3 == "all" ];then
+  echo  "new_pkg_path: $4"
+  echo  "new_env_path: $5"
+elif [ $3 == "pkg" ];then
+  echo  "new_pkg_path: $4"
+elif [ $3 == "env" ];then
+  echo  "new_env_path: $4"
+else
+  echo "invalid install type:$3"
+fi
+echo  "check enviroment:"
+set|grep DCMD
+echo  "End install."
+exit 0
+}
+
+if [ $1 == "prepare" ]; then
+  prepare $*
+elif [ $1 == "start" ]; then
+  start $*
+elif [ $1 == "stop" ]; then
+  stop  $*
+elif [ $1 == "check" ]; then
+  check $*
+elif [ $1 == "install" ]; then
+  install $*
+else
+  echo "invalid action"
+  exit 1
+fi

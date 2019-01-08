@@ -1,0 +1,10 @@
+<?php
+
+return [
+    'class' => 'yii\db\Connection',
+    'dsn' => 'mysql:host=m3204i.gzxy.db.lecloud.com;port=3204;dbname=dcmd_private',
+    'username' => 'dcmd_private',
+    'password' => 'W2017dcmd_priv@4vteL',
+    'charset' => 'utf8',
+];
+

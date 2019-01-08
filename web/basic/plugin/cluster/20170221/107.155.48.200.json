@@ -1,0 +1,1 @@
+{"cluster_name": "pro01-hl-fra-de", "cluster": [{"uuid": "ebe4c22f-0aa9-48b4-a578-e3f4d0189fe3", "vm_ip": "10.120.168.110", "hypervisor_name": "c-167-12-pro01-hl.fra-de.vps.letv.cn", "image_name": "LetvOS_1.5.5", "flavor_name": "4C-8G-100G", "hypervisor_ip": "10.120.167.12"}]}

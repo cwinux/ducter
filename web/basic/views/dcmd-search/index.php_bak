@@ -1,0 +1,261 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use yii\helpers\Url;
+use yii\bootstrap\Alert;
+use yii\widgets\ActiveForm;
+/* @var $this yii\web\View */
+/* @var $searchModel app\models\DcmdNodeSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = '搜索';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<style type="text/css">
+.search-result {
+    position: absolute;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    top:47%;
+    left:65%;
+}
+
+.result {
+    height:float;
+    width:60%;
+    margin-left:60px;/*设置元素跟其他元素的距离为20像素*/
+    float:right;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+    background:rgba(255, 255, 255, 0.5);
+}
+
+.search-wrapper {
+    position: absolute;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    top:25%;
+    left:18%;
+}
+.search-wrapper.active {}
+
+.search-wrapper .input-holder {
+    overflow: hidden;
+    height: 50px;
+    background: rgba(255,255,255,0);
+    border-radius:6px;
+    position: relative;
+    width:50px;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+.search-wrapper.active .input-holder {
+    border-radius: 50px;
+    width:300px;
+    background: rgba(0,0,0,0.5);
+    -webkit-transition: all .5s cubic-bezier(0.000, 0.105, 0.035, 1.570);
+    -moz-transition: all .5s cubic-bezier(0.000, 0.105, 0.035, 1.570);
+    transition: all .5s cubic-bezier(0.000, 0.105, 0.035, 1.570);
+}
+
+.search-wrapper .input-holder .search-input {
+    width:100%;
+    height: 35px;
+    padding:0px 70px 0 20px;
+    opacity: 0;
+    position: absolute;
+    top:0px;
+    left:0px;
+    background: transparent;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border:none;
+    outline:none;
+    font-family:"Open Sans", Arial, Verdana;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    color:#FFF;
+    -webkit-transform: translate(0, 60px);
+    -moz-transform: translate(0, 60px);
+    transform: translate(0, 60px);
+    -webkit-transition: all .3s cubic-bezier(0.000, 0.105, 0.035, 1.570);
+    -moz-transition: all .3s cubic-bezier(0.000, 0.105, 0.035, 1.570);
+    transition: all .3s cubic-bezier(0.000, 0.105, 0.035, 1.570);
+
+    -webkit-transition-delay: 0.3s;
+    -moz-transition-delay: 0.3s;
+    transition-delay: 0.3s;
+}
+.search-wrapper.active .input-holder .search-input {
+    opacity: 1;
+    -webkit-transform: translate(0, 10px);
+    -moz-transform: translate(0, 10px);
+    transform: translate(0, 10px);
+}
+
+.search-wrapper .input-holder .search-icon {
+    width:10px;
+    height:10px;
+    border:none;
+    border-radius:6px;
+    background: #FFF;
+    padding:0px;
+    outline:none;
+    position: relative;
+    z-index: 2;
+    float:right;
+    cursor: pointer;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+.search-wrapper.active .input-holder .search-icon {
+    width: 40px;
+    height:40px;
+    margin: 5px;
+    border-radius: 30px;
+}
+.search-wrapper .input-holder .search-icon span {
+    width:22px;
+    height:22px;
+    display: inline-block;
+    vertical-align: middle;
+    position:relative;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    transform: rotate(45deg);
+    -webkit-transition: all .4s cubic-bezier(0.650, -0.600, 0.240, 1.650);
+    -moz-transition: all .4s cubic-bezier(0.650, -0.600, 0.240, 1.650);
+    transition: all .4s cubic-bezier(0.650, -0.600, 0.240, 1.650);
+
+}
+.search-wrapper.active .input-holder .search-icon span {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+.search-wrapper .input-holder .search-icon span::before, .search-wrapper .input-holder .search-icon span::after {
+    position: absolute;
+    content:'';
+}
+.search-wrapper .input-holder .search-icon span::before {
+    width: 4px;
+    height: 14px;
+    left: 8px;
+    top: 14px;
+    border-radius: 2px;
+    background: #974BE0;
+}
+.search-wrapper .input-holder .search-icon span::after {
+    width: 14px;
+    height: 14px;
+    left: 2px;
+    top: 0px;
+    border-radius: 16px;
+    border: 4px solid #974BE0;
+}
+
+.search-wrapper .result-container {
+    width: 100%;
+    position: absolute;
+    top:60px;
+    left:0px;
+    text-align: center;
+    font-family: "Open Sans", Arial, Verdana;
+    font-size: 14px;
+    display:none;
+    color:#B7B7B7;
+}
+
+
+@media screen and (max-width: 560px) {
+    .search-wrapper.active .input-holder {width:200px;}
+}
+</style>
+<div class="dcmd-fault-index">
+
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php
+    if( Yii::$app->getSession()->hasFlash('success') ) {
+        echo Alert::widget([
+            'options' => [
+                'class' => 'alert-success', //这里是提示框的class
+            ],
+            'body' => Yii::$app->getSession()->getFlash('success'), //消息体
+        ]);
+    }
+    if( Yii::$app->getSession()->hasFlash('error') ) {
+        echo Alert::widget([
+            'options' => [
+                'class' => 'alert-success',
+            ],
+            'body' => "<font color=red>".Yii::$app->getSession()->getFlash('error')."</font>",
+        ]);
+    }
+   ?>
+</div>
+<form onsubmit="submitFn(this, event);">
+  <div class="search-wrapper active">
+    <div class="input-holder">
+      <input type="text" class="search-input" placeholder="请输入关键词">
+      <button class="search-icon"><span></span></button>
+    </div>
+    <span class="close" onclick="searchToggle(this, event);"></span>
+    <div class="result-container" style="display: block;"></div>
+  </div>
+    <div class="result"></div>
+</form>
+<script type="text/javascript">
+  function searchToggle(obj, evt){
+    var container = $(obj).closest('.search-wrapper');
+    
+    if(!container.hasClass('active')){
+      container.addClass('active');
+      evt.preventDefault();
+    }
+    else if(container.hasClass('active') && $(obj).closest('.input-holder').length == 0){
+      container.removeClass('active');
+      // clear input
+      container.find('.search-input').val('');
+      // clear and hide result container when we press close
+      container.find('.result-container').fadeOut(100, function(){$(this).empty();});
+    }
+  }
+  
+  function submitFn(obj, evt){
+    value = $(obj).find('.search-input').val().trim();
+    _html = "您搜索的结果如下:";
+    if(!value.length){
+      _html = "关键词不能为空。";
+      $(obj).find('.result-container').html('<span>'+_html+'</span>');
+      $(obj).find('.result').html('<span> </span>');
+    }
+    else{
+      $(obj).find('.result-container').html('<span> </span>');
+      url = "/index.php?r=dcmd-search/net-search";
+      $.get(url,{network:value},function(data,status){
+        if(status == "success") {
+          data = $.parseJSON(data);
+          msg = '<table id="table" class="table" style="font-family:'+'宋体'+'; font-size:15px;"><tbody>';
+          msg += '<tr><th>集群</th><th>IP</th><th>网段</th></tr>';
+          for(var i=0; i<data.length; i++) {
+            msg += '<tr><td>'+data[i]["app"]+'</td><td>'+data[i]["ip"]+'</td><td>'+data[i]["net"]+'</td></tr>'; 
+          }
+          msg += '</tbody></table>';
+          _html += "<b>" + msg + "</b>";
+          $(obj).find('.result').html('<span>' + _html + '</span>');
+        }
+        else {
+          alert("查询错误!")
+        }
+      });
+    }
+    $(obj).find('.result-container').fadeIn(100);
+    
+    evt.preventDefault();
+  }
+</script>

@@ -1,0 +1,130 @@
+#!/bin/bash
+
+PATH=$PATH:/usr/sbin:/sbin:/bin
+export PATH
+echo $PATH
+
+PROXY_NAME=
+LEJIAN_DIR=tomcat-sarrsAgent-8080
+LEKAN_DIR=tomcat-lekan_cn-7070
+#LESOU_DIR=tomcat-lekan_cn-7070
+#WANXIANG_DIR=tomcat-lekan_cn-7070
+
+for domain in `tomcat-admin list-domains --full | awk '{print $2}' | grep -v NAME`;do ps aux|grep $domain |grep -v grep>/dev/null;if [ $? -eq '0' ];then PROXY_NAME=$domain; else continue;fi;done
+#PROXY_NAME=lekan_cn
+[[ ! -n "$PROXY_NAME" ]] && echo "----> Proxy process is not found!" && exit 1
+echo "----> Proxy process is exist. PROXY_NAME= $PROXY_NAME"
+
+if [ "$PROXY_NAME"x == "lekan_cn"x ];then
+    SERVICE_HOME=$DCMD_SVR_PATH/$LEKAN_DIR
+elif [ "$PROXY_NAME"x == "sarrsAgent"x ];then
+    SERVICE_HOME=$DCMD_SVR_PATH/$LEJIAN_DIR
+else
+    echo "---- > Proxy domain is invalid. PROXY_NAME= $PROXY_NAME"
+    exit 1
+fi
+echo "----> Service home is ready. SERVICE_HOME= $SERVICE_HOME"
+
+WAR_HOME=$DCMD_SVR_PATH/wars
+[[ ! -d "$WAR_HOME" ]] && mkdir -p $WAR_HOME
+echo "----> War home is ready. WAR_HOME= $WAR_HOME"
+
+prepare(){
+echo  "Begin prepare........."
+echo  "Action: $1"
+echo  "apollo service dir: $2"
+id $DCMD_SVR_USER >/dev/null  
+if [ $? -ne 0 ];then  
+   useradd $DCMD_SVR_USER  
+   id $DCMD_SVR_USER
+fi 
+echo "----> $DCMD_SVR_USER user is ready."
+
+[[ ! -d "$DCMD_SVR_PATH" ]] && mkdir -p $DCMD_SVR_PATH
+echo "----> Service base path is ready. DCMD_SVR_PATH= $DCMD_SVR_PATH"
+
+chown -R $DCMD_SVR_USER.$DCMD_SVR_USER $DCMD_SVR_PATH
+id $DCMD_SVR_USER >/dev/null && [[ -d "$DCMD_SVR_PATH" ]]
+
+exit $?
+}
+
+start(){
+echo  "Begin start........."
+echo  "Action: $1"
+echo  "apollo service dir: $2"
+#cd $SERVICE_HOME/bin
+#sh startup.sh 
+exit $?
+}
+
+stop(){
+echo  "Begin stop........."
+echo  "Action: $1"
+echo  "apollo service dir: $2"
+#cd $SERVICE_HOME/bin
+#sh shutdown.sh
+exit $?
+}
+
+check(){
+echo  "Begin check........."
+echo  "Action: $1"
+echo  "apollo service dir: $2"
+ps aux | grep $PROXY_NAME | grep -v grep
+exit $?
+}
+
+install(){
+echo  "Begin install........."
+echo  "Action: $1"
+echo  "apollo service dir: $2"
+echo  "install type: $3"
+
+LATEST_VERSION=$PROXY_NAME-$DCMD_SVR_ENV_V.war
+if [ $3 == "all" ];then
+  echo  "new_pkg_path: $4"
+  echo  "new_env_path: $5"
+  SERVICE_PKG=$4
+  SERVICE_ENV=$5
+  echo "The latest version is $DCMD_SVR_ENV_V"
+
+  cp -af $SERVICE_ENV/wars/$LATEST_VERSION $WAR_HOME/
+ 
+  md5sum $WAR_HOME/*
+  echo "----> copy complete!"
+  echo "----> new conf is $WAR_HOME/$LATEST_VERSION"
+ # tomcat-admin update-app $PROXY_NAME $WAR_HOME/$LATEST_VERSION
+elif [ $3 == "pkg" ];then
+  echo  "new_pkg_path: $4"
+elif [ $3 == "env" ];then
+  echo  "new_env_path: $4"
+  SERVICE_ENV=$4
+  echo "The latest version is $DCMD_SVR_ENV_V"
+
+  cp -af $SERVICE_ENV/wars/$LATEST_VERSION $WAR_HOME/
+  md5sum $WAR_HOME/*
+  echo "----> copy complete!"
+  echo "----> new conf is $WAR_HOME/$LATEST_VERSION"
+ # tomcat-admin update-app $PROXY_NAME $WAR_HOME/$LATEST_VERSION
+else
+  echo "invalid install type:$3"
+fi
+echo  "End install."
+}
+
+if [ $1 == "start" ]; then
+  start $*
+elif [ $1 == "stop" ]; then
+  stop $*
+elif [ $1 == "check" ]; then
+  sleep 3
+  check $*
+elif [ $1 == "install" ]; then
+  install $*
+elif [ $1 == "prepare" ]; then
+  prepare $*
+else
+  echo "invalid action"
+fi
+
